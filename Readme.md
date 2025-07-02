@@ -8,9 +8,8 @@ This is a web-based dashboard system for managing laboratory information, groups
 
 ```
 /
-├── clean/           # React frontend for employee/user interface
+├── clean/           # Node.js + Express backend 
 ├── DRDOApp/         # React frontend for admin panel
-├── backend/         # Node.js + Express backend (optional)
 ├── package.json     # Root package file (if using monorepo structure)
 └── README.md
 ```
