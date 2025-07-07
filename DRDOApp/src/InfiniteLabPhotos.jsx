@@ -1,267 +1,11 @@
-// import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-// import axios from "axios";
-// const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-// export default function InfiniteLabPhotos({ labId }) {
-//   const [photos, setPhotos] = useState([]);
-//   const [skip, setSkip] = useState(0);
-//   const limit = 3;
-//   const loadingRef = useRef(false);
-//   const [hasMore, setHasMore] = useState(true);
-//   const containerRef = useRef(null);
-//   const autoSlideIntervalRef = useRef(null);
-//   const [isHovered, setIsHovered] = useState(false);
-//   const autoSlideDelay = 3000;
-//   const [currentIndex, setCurrentIndex] = useState(0);
-//   const [isLoading, setIsLoading] = useState(false);
-
-//   const loadPhotos = async () => {
-//     if (loadingRef.current || !hasMore) return;
-//     loadingRef.current = true;
-//     setIsLoading(true);
-
-//     try {
-//       const res = await axios.get(
-//         `${apiUrl}/api/labs/${labId}/photos?skip=${skip}&limit=${limit}`
-//       );
-
-//       if (res.data.length < limit) setHasMore(false);
-//       setPhotos((prev) => [...prev, ...res.data]);
-//       setSkip((prev) => prev + limit);
-//     } catch (err) {
-//       console.error("Error loading photos:", err);
-//     } finally {
-//       loadingRef.current = false;
-//       setIsLoading(false);
-//     }
-//   };
-
-//   const scrollToIndex = useCallback(
-//     (index) => {
-//       if (!containerRef.current || photos.length === 0) return;
-//       const photoBlockWidthVW = 75;
-//       const gapPx = parseFloat(getComputedStyle(containerRef.current).gap || "0px");
-//       const itemWidth = (containerRef.current.clientWidth * photoBlockWidthVW) / 100 + gapPx;
-//       containerRef.current.scrollTo({
-//         left: index * itemWidth,
-//         behavior: "smooth",
-//       });
-//     },
-//     [photos]
-//   );
-
-//   const handleNext = useCallback(() => {
-//     setCurrentIndex((prevIndex) => {
-//       const totalItems = photos.length + (!hasMore ? 1 : 0);
-//       const nextIndex = (prevIndex + 1) % totalItems;
-//       scrollToIndex(nextIndex);
-//       if (nextIndex >= photos.length - 2 && hasMore && !loadingRef.current) {
-//         loadPhotos();
-//       }
-//       return nextIndex;
-//     });
-//   }, [photos.length, hasMore, scrollToIndex]);
-
-//   const handlePrev = useCallback(() => {
-//     setCurrentIndex((prevIndex) => {
-//       const totalItems = photos.length + (!hasMore ? 1 : 0);
-//       const prevIndexCalculated = (prevIndex - 1 + totalItems) % totalItems;
-//       scrollToIndex(prevIndexCalculated);
-//       return prevIndexCalculated;
-//     });
-//   }, [photos.length, hasMore, scrollToIndex]);
-
-//   useEffect(() => {
-//     loadPhotos();
-//   }, [labId]);
-
-//   useEffect(() => {
-//     const startAutoSlide = () => {
-//       if (autoSlideIntervalRef.current) {
-//         clearInterval(autoSlideIntervalRef.current);
-//       }
-//       autoSlideIntervalRef.current = setInterval(() => {
-//         if (!isHovered && photos.length > 0) {
-//           handleNext();
-//         }
-//       }, autoSlideDelay);
-//     };
-//     startAutoSlide();
-//     return () => clearInterval(autoSlideIntervalRef.current);
-//   }, [isHovered, photos.length, handleNext]);
-
-//   const renderedPhotos = useMemo(() => {
-//     return photos.map((photo, index) => (
-//       <div
-//         key={photo._id}
-//         style={{
-//           scrollSnapAlign: "center",
-//           flexShrink: 0,
-//           width: "75vw",
-//           height: "360px",
-//           position: "relative",
-//           borderRadius: "8px",
-//           boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-//           overflow: "hidden",
-//           display: "flex",
-//           alignItems: "center",
-//           justifyContent: "center",
-//           willChange: "transform",
-//           transform: "translateZ(0)",
-//         }}
-//       >
-//         <img
-//           src={`${apiUrl}${photo.fileUrl}`}
-//           alt={photo.name}
-//           loading={index === 0 ? "eager" : "lazy"}
-//           style={{
-//             width: "100%",
-//             height: "100%",
-//             objectFit: "cover",
-//             display: "block",
-//           }}
-//         />
-//       </div>
-//     ));
-//   }, [photos]);
-
-//   return (
-//     <div
-//       style={{
-//         position: "relative",
-//         width: "100vw",
-//         padding: "1rem 0",
-//         display: "flex",
-//         flexDirection: "column",
-//         alignItems: "center",
-//         justifyContent: "center",
-//       }}
-//     >
-//       <div
-//         ref={containerRef}
-//         className="overflow-x-auto flex hide-scrollbar"
-//         style={{
-//           scrollSnapType: "x mandatory",
-//           scrollBehavior: "smooth",
-//           width: "100%",
-//           paddingLeft: "12.5vw",
-//           paddingRight: "12.5vw",
-//           gap: "1rem",
-//         }}
-//         tabIndex={0}
-//         onMouseEnter={() => setIsHovered(true)}
-//         onMouseLeave={() => setIsHovered(false)}
-//       >
-//         {renderedPhotos}
-//         {!hasMore && (
-//           <div
-//             style={{
-//               scrollSnapAlign: "center",
-//               flexShrink: 0,
-//               width: "75vw",
-//               height: "360px",
-//               display: "flex",
-//               alignItems: "center",
-//               justifyContent: "center",
-//               fontSize: "1.2rem",
-//               backgroundColor: "#f0f0f0",
-//               borderRadius: "8px",
-//               boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-//             }}
-//           >
-//             No more photos
-//           </div>
-//         )}
-//         {isLoading && (
-//           <div
-//             style={{
-//               scrollSnapAlign: "center",
-//               flexShrink: 0,
-//               width: "75vw",
-//               height: "360px",
-//               display: "flex",
-//               alignItems: "center",
-//               justifyContent: "center",
-//               fontSize: "1.2rem",
-//               backgroundColor: "#f0f0f0",
-//               borderRadius: "8px",
-//               opacity: 0.8,
-//             }}
-//           >
-//             Loading more photos...
-//           </div>
-//         )}
-//       </div>
-
-//       {/* Navigation */}
-//       <button
-//         onClick={handlePrev}
-//         style={navButtonStyle("left")}
-//       >
-//         {"<"}
-//       </button>
-//       <button
-//         onClick={handleNext}
-//         style={navButtonStyle("right")}
-//       >
-//         {">"}
-//       </button>
-
-//       {/* Dots */}
-//       <div style={{ display: "flex", marginTop: "1rem", gap: "0.5rem" }}>
-//         {Array.from({ length: photos.length + (!hasMore ? 1 : 0) }).map((_, index) => (
-//           <span
-//             key={index}
-//             style={{
-//               width: "10px",
-//               height: "10px",
-//               borderRadius: "50%",
-//               backgroundColor: currentIndex === index ? "#333" : "#ccc",
-//               cursor: "pointer",
-//               transition: "background-color 0.3s ease",
-//             }}
-//             onClick={() => {
-//               setCurrentIndex(index);
-//               scrollToIndex(index);
-//             }}
-//           />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
-// const navButtonStyle = (side) => ({
-//   position: "absolute",
-//   [side]: "1rem",
-//   top: "50%",
-//   transform: "translateY(-50%)",
-//   zIndex: 10,
-//   background: "rgba(0,0,0,0.5)",
-//   color: "white",
-//   border: "none",
-//   borderRadius: "50%",
-//   width: "40px",
-//   height: "40px",
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "center",
-//   cursor: "pointer",
-//   fontSize: "1.5rem",
-//   paddingBottom: "4px",
-// });
-
-
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import axios from "axios";
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function InfiniteLabPhotos({ labId }) {
   const [photos, setPhotos] = useState([]);
-  const [skip, setSkip] = useState(0);
-  const limit = 3;
+  const limit = 10;
   const loadingRef = useRef(false);
-  const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef(null);
   const autoSlideIntervalRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -270,18 +14,17 @@ export default function InfiniteLabPhotos({ labId }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const loadPhotos = async () => {
-    if (loadingRef.current || !hasMore) return;
+    if (loadingRef.current) return;
     loadingRef.current = true;
     setIsLoading(true);
 
     try {
       const res = await axios.get(
-        `${apiUrl}/api/labs/${labId}/photos?skip=${skip}&limit=${limit}`
+        `${apiUrl}/api/labs/${labId}/photos?limit=${limit}&sortBy=createdAt:desc`
       );
 
-      if (res.data.length < limit) setHasMore(false);
-      setPhotos((prev) => [...prev, ...res.data]);
-      setSkip((prev) => prev + limit);
+      setPhotos(res.data);
+      setCurrentIndex(0);
     } catch (err) {
       console.error("Error loading photos:", err);
     } finally {
@@ -293,10 +36,9 @@ export default function InfiniteLabPhotos({ labId }) {
   const scrollToIndex = useCallback(
     (index) => {
       if (!containerRef.current || photos.length === 0) return;
-      // Define a smaller image width for calculation
-      const photoWidth = 500; // Fixed width in pixels for the image block
+      const photoWidth = 500;
       const gapPx = parseFloat(getComputedStyle(containerRef.current).gap || "0px");
-      const itemWidth = photoWidth + gapPx; // Total width for scrolling including gap
+      const itemWidth = photoWidth + gapPx;
 
       containerRef.current.scrollTo({
         left: index * itemWidth,
@@ -308,27 +50,44 @@ export default function InfiniteLabPhotos({ labId }) {
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prevIndex) => {
-      // Calculate total items including "No more photos" and "Loading" placeholders
-      const totalItems = photos.length + (!hasMore ? 1 : 0) + (isLoading && hasMore ? 1 : 0);
+      const totalItems = photos.length;
+      if (totalItems === 0) return 0;
+
       const nextIndex = (prevIndex + 1) % totalItems;
       scrollToIndex(nextIndex);
-      // Preload next set of photos when approaching the end of current batch
-      if (nextIndex >= photos.length - 2 && hasMore && !loadingRef.current) {
-        loadPhotos();
-      }
       return nextIndex;
     });
-  }, [photos.length, hasMore, scrollToIndex, loadPhotos, isLoading]); // Added isLoading to dependencies
+  }, [photos.length, scrollToIndex]);
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prevIndex) => {
-      // Calculate total items including "No more photos" and "Loading" placeholders
-      const totalItems = photos.length + (!hasMore ? 1 : 0) + (isLoading && hasMore ? 1 : 0);
+      const totalItems = photos.length;
+      if (totalItems === 0) return 0;
+
       const prevIndexCalculated = (prevIndex - 1 + totalItems) % totalItems;
       scrollToIndex(prevIndexCalculated);
       return prevIndexCalculated;
     });
-  }, [photos.length, hasMore, scrollToIndex, isLoading]); // Added isLoading to dependencies
+  }, [photos.length, scrollToIndex]);
+
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current || photos.length === 0) return;
+
+    if (autoSlideIntervalRef.current) {
+      clearTimeout(autoSlideIntervalRef.current);
+    }
+
+    autoSlideIntervalRef.current = setTimeout(() => {
+      const scrollLeft = containerRef.current.scrollLeft;
+      const photoWidth = 500;
+      const gapPx = parseFloat(getComputedStyle(containerRef.current).gap || "0px");
+      const itemWidth = photoWidth + gapPx;
+
+      const newIndex = Math.round(scrollLeft / itemWidth);
+
+      setCurrentIndex(Math.min(Math.max(0, newIndex), photos.length - 1));
+    }, 150);
+  }, [photos.length]);
 
   useEffect(() => {
     loadPhotos();
@@ -356,19 +115,19 @@ export default function InfiniteLabPhotos({ labId }) {
         style={{
           scrollSnapAlign: "center",
           flexShrink: 0,
-          width: "500px", // Smaller fixed width
-          height: "300px", // Smaller fixed height
+          width: "500px",
+          height: "300px",
           position: "relative",
           borderRadius: "8px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)", // Slightly stronger shadow for depth
+          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           willChange: "transform",
           transform: "translateZ(0)",
-          pointerEvents: "none", // Allows clicks to pass through to buttons
-          backgroundColor: "#fff", // White background for consistency
+          // No pointerEvents: "none" here on the photo wrapper itself
+          backgroundColor: "#fff",
         }}
       >
         <img
@@ -387,67 +146,101 @@ export default function InfiniteLabPhotos({ labId }) {
     ));
   }, [photos]);
 
-  const navButtonStyle = useCallback((side) => ({
-    position: "absolute",
-    [side]: "1rem",
-    top: "50%",
-    transform: "translateY(-50%)",
-    zIndex: 10,
-    background: "rgba(0,0,0,0.5)", // Darker background for better contrast
-    color: "white",
-    border: "none",
-    borderRadius: "50%",
-    width: "40px", // Slightly smaller buttons
-    height: "40px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    fontSize: "1.5rem", // Standard arrow size
-    paddingBottom: "2px", // Minor adjustment for centering arrow character
-    opacity: isHovered ? 1 : 0, // Show on hover
-    transition: "opacity 0.3s ease, background-color 0.3s ease", // Smooth transitions
-    backdropFilter: "blur(3px)", // Stronger blur for better separation
-    "&:hover": {
-      backgroundColor: "rgba(0,0,0,0.7)", // Darken on hover
-    },
-  }), [isHovered]);
+  const navButtonStyle = useCallback(
+    (side) => ({
+      position: "absolute",
+      // Calculate top position based on the fixed image height (300px)
+      top: "calc(50% - 150px + 150px)", // 50% of the main container, then adjust
+      transform: "translateY(-50%)", // Center vertically relative to its own height
 
+      // Position relative to the *visible area* of the image container (500px width)
+      [side === "left" ? "left" : "right"]: `calc(50% - 250px + 10px)`, // 50% of main container, minus half image width, plus some padding from edge
+      // For the other side, if it's 'right', it will be `calc(50% + 250px - 50px)` for button width
+      // Let's refine for clarity:
+      ...(side === "left" && { left: 'calc(50% - 250px + 10px)' }), // 50% of 960px container, minus half photo width (250px), plus 10px for inner padding
+      ...(side === "right" && { right: 'calc(50% - 250px + 10px)' }), // Same logic for right
+
+      zIndex: 10,
+      background: "rgba(0,0,0,0.5)",
+      color: "white",
+      border: "none",
+      borderRadius: "50%",
+      width: "40px",
+      height: "40px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      fontSize: "1.5rem",
+      paddingBottom: "2px",
+      opacity: isHovered ? 1 : 0,
+      transition: "opacity 0.3s ease, background-color 0.3s ease",
+      backdropFilter: "blur(3px)",
+      "&:hover": {
+        backgroundColor: "rgba(0,0,0,0.7)",
+      },
+    }),
+    [isHovered]
+  );
 
   return (
     <div
       style={{
         position: "relative",
-        width: "100%", // Changed to 100% for better responsiveness within parent
-        maxWidth: "960px", // Max width for larger screens to keep it contained
-        margin: "2rem auto", // Center the component and add vertical margin
+        width: "100%",
+        maxWidth: "960px",
+        // The height of the main container should accommodate the images + dots
+        minHeight: "350px", // 300px image height + some margin for dots
+        margin: "2rem auto",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        overflow: "hidden",
+        overflow: "hidden", // Still hide overflow for the main component
       }}
+      // Re-enable hover listener on the main container to show/hide buttons
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <div
+      <div // This is the scrollable container for the images
         ref={containerRef}
         className="overflow-x-auto flex hide-scrollbar"
         style={{
           scrollSnapType: "x mandatory",
           scrollBehavior: "smooth",
-          width: "calc(500px + 2rem)", // Adjust container width to show one image + padding clearly
-          margin: "0 auto", // Center the inner scroll container
-          padding: "0 1rem", // Padding inside the scroll area to show partial next/prev image
+          width: "calc(500px + 2rem)", // Correct width (image + padding on both sides)
+          margin: "0 auto", // Center the visible scroll area
+          padding: "0 1rem", // Padding to show partial next/prev image
           gap: "1rem",
-          position: "relative", // Crucial for positioning arrows inside
-          minHeight: "300px", // Ensure minimum height
-          boxSizing: "content-box", // Ensure padding is added to the total width
+          position: "relative", // KEEP this for scrollSnapAlign to work reliably
+          height: "300px", // Set fixed height
+          boxSizing: "content-box",
         }}
         tabIndex={0}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onScroll={handleScroll}
       >
         {renderedPhotos}
-        {!hasMore && photos.length > 0 && (
+        {isLoading && photos.length === 0 && (
+          <div
+            style={{
+              scrollSnapAlign: "center",
+              flexShrink: 0,
+              width: "500px",
+              height: "300px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1.2rem",
+              color: "#666",
+              backgroundColor: "#f8f8f8",
+              borderRadius: "8px",
+              opacity: 0.8,
+            }}
+          >
+            Loading photos...
+          </div>
+        )}
+        {!isLoading && photos.length === 0 && (
           <div
             style={{
               scrollSnapAlign: "center",
@@ -467,69 +260,56 @@ export default function InfiniteLabPhotos({ labId }) {
               padding: "1rem",
             }}
           >
-            <h3>All Caught Up!</h3>
-            <p>No more photos to display.</p>
+            <h3>No Photos Available</h3>
+            <p>There are no photos to display for this lab.</p>
           </div>
         )}
-        {isLoading && (
-          <div
-            style={{
-              scrollSnapAlign: "center",
-              flexShrink: 0,
-              width: "500px",
-              height: "300px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "1.2rem",
-              color: "#666",
-              backgroundColor: "#f8f8f8",
-              borderRadius: "8px",
-              opacity: 0.8,
-            }}
-          >
-            Loading more photos...
-          </div>
-        )}
-
-        {/* Navigation buttons moved inside containerRef div */}
-        <button
-          onClick={handlePrev}
-          style={navButtonStyle("left")}
-          aria-label="Previous photo"
-        >
-          {"<"}
-        </button>
-        <button
-          onClick={handleNext}
-          style={navButtonStyle("right")}
-          aria-label="Next photo"
-        >
-          {">"}
-        </button>
       </div>
+
+      {/* Navigation buttons moved back to the parent of containerRef */}
+      {/* Their position will be absolute relative to the outermost div */}
+      {photos.length > 0 && (
+        <>
+          <button
+            onClick={handlePrev}
+            style={navButtonStyle("left")}
+            aria-label="Previous photo"
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={handleNext}
+            style={navButtonStyle("right")}
+            aria-label="Next photo"
+          >
+            {">"}
+          </button>
+        </>
+      )}
 
       {/* Dots */}
-      <div style={{ display: "flex", marginTop: "1.5rem", gap: "0.6rem" }}>
-        {Array.from({ length: photos.length + (!hasMore && photos.length > 0 ? 1 : 0) + (isLoading && hasMore ? 1 : 0) }).map((_, index) => (
-          <span
-            key={index}
-            style={{
-              width: currentIndex === index ? "12px" : "10px", // Active dot slightly larger
-              height: currentIndex === index ? "12px" : "10px",
-              borderRadius: "50%",
-              backgroundColor: currentIndex === index ? "#333" : "#bbb", // Darker active dot
-              cursor: "pointer",
-              transition: "all 0.3s ease", // Smooth transition for dot size and color
-            }}
-            onClick={() => {
-              setCurrentIndex(index);
-              scrollToIndex(index);
-            }}
-            aria-label={`Go to photo ${index + 1}`}
-          />
-        ))}
-      </div>
+      {photos.length > 0 && (
+        <div style={{ display: "flex", marginTop: "1.5rem", gap: "0.6rem" }}>
+          {Array.from({ length: photos.length }).map((_, index) => (
+            <span
+              key={index}
+              style={{
+                width: currentIndex === index ? "12px" : "10px",
+                height: currentIndex === index ? "12px" : "10px",
+                borderRadius: "50%",
+                backgroundColor: currentIndex === index ? "#333" : "#bbb",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onClick={() => {
+                setCurrentIndex(index);
+                scrollToIndex(index);
+              }}
+              aria-label={`Go to photo ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

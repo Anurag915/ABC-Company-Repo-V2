@@ -1,24 +1,25 @@
+// ... all your imports remain unchanged
 import React, { useState, useEffect } from "react";
-import axiosInstance from "./axiosInstance"; // Adjust path as needed
+import axiosInstance from "./axiosInstance";
 import {
-  UploadCloud, // Main heading icon
-  FolderDot, // Group select icon
-  Box, // Type select icon
-  Github, // GitHub URL icon
-  FolderOpen, // Cloned Repo Path icon
-  FileJson, // Metadata icon
-  FileInput, // File input icon
-  Send, // Submit button icon
-  Loader2, // Loading spinner
-  CheckCircle, // Success message icon
-  XCircle, // Error message icon
-  Info, // Info icon for metadata hint
-} from "lucide-react"; // Import necessary icons
+  UploadCloud,
+  FolderDot,
+  Box,
+  Github,
+  FolderOpen,
+  FileJson,
+  FileInput,
+  Send,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  Info,
+} from "lucide-react";
 
 const SoftwareRepoUpload = () => {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success', 'error', null
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [submitMessage, setSubmitMessage] = useState("");
   const [formData, setFormData] = useState({
     group: "",
@@ -29,7 +30,6 @@ const SoftwareRepoUpload = () => {
     file: null,
   });
 
-  // Fetch groups on component mount
   useEffect(() => {
     const fetchGroups = async () => {
       try {
@@ -37,7 +37,6 @@ const SoftwareRepoUpload = () => {
         setGroups(res.data);
       } catch (err) {
         console.error("Failed to fetch groups", err.response || err);
-        // Optionally set an error message for group fetching
       }
     };
     fetchGroups();
@@ -45,8 +44,8 @@ const SoftwareRepoUpload = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    setSubmitStatus(null); // Clear status on change
-    setSubmitMessage(""); // Clear message on change
+    setSubmitStatus(null);
+    setSubmitMessage("");
 
     if (name === "file") {
       setFormData({ ...formData, file: files[0] });
@@ -61,12 +60,9 @@ const SoftwareRepoUpload = () => {
     setSubmitStatus(null);
     setSubmitMessage("");
 
-    // Validate if a file or GitHub URL or Cloned Repo Path is provided
     if (!formData.file && !formData.githubUrl && !formData.clonedRepoPath) {
       setSubmitStatus("error");
-      setSubmitMessage(
-        "Please provide either a file, a GitHub URL, or a Cloned Repository Path."
-      );
+      setSubmitMessage("Please provide either a file, a GitHub URL, or a Cloned Repository Path.");
       setLoading(false);
       return;
     }
@@ -83,19 +79,15 @@ const SoftwareRepoUpload = () => {
       payload.append("group", formData.group);
       payload.append("type", formData.type);
       if (formData.githubUrl) payload.append("githubUrl", formData.githubUrl);
-      if (formData.clonedRepoPath)
-        payload.append("clonedRepoPath", formData.clonedRepoPath);
+      if (formData.clonedRepoPath) payload.append("clonedRepoPath", formData.clonedRepoPath);
 
-      // Attempt to parse metadata to ensure it's valid JSON if provided
       if (formData.metadata) {
         try {
           const parsedMetadata = JSON.parse(formData.metadata);
-          payload.append("metadata", JSON.stringify(parsedMetadata)); // Re-stringifys to ensure it's compact JSON
+          payload.append("metadata", JSON.stringify(parsedMetadata));
         } catch (jsonErr) {
           setSubmitStatus("error");
-          setSubmitMessage(
-            "Invalid JSON format for metadata. Please check your input."
-          );
+          setSubmitMessage("Invalid JSON format for metadata. Please check your input.");
           setLoading(false);
           return;
         }
@@ -117,18 +109,13 @@ const SoftwareRepoUpload = () => {
         clonedRepoPath: "",
         file: null,
       });
-      // Reset file input value to clear displayed file name
-      if (document.getElementById("file-input")) {
-        document.getElementById("file-input").value = "";
-      }
+
+      // ✅ FIXED: Replaced optional chaining with a safe check
+      const fileInput = document.getElementById("file-input");
+      if (fileInput) fileInput.value = "";
     } catch (err) {
       setSubmitStatus("error");
-      setSubmitMessage(
-        "Upload failed: " +
-          (err.response?.data?.message ||
-            err.message ||
-            "An unknown error occurred.")
-      );
+      setSubmitMessage("Upload failed: " + (err.response?.data?.message || err.message || "An unknown error occurred."));
       console.error("Upload error:", err.response || err);
     } finally {
       setLoading(false);
@@ -137,19 +124,18 @@ const SoftwareRepoUpload = () => {
 
   const inputClasses =
     "w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-gray-800 placeholder-gray-500";
+
   const labelClasses =
     "block text-sm font-medium text-gray-700 mb-1 flex items-center";
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 mt-16">
-      <div className=" mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-        {/* Page Header */}
+      <div className="mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
         <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 text-center flex items-center justify-center">
           <UploadCloud className="w-10 h-10 text-blue-600 mr-3" />
           Upload Software Repository
         </h2>
 
-        {/* Submission Status Message */}
         {submitStatus && (
           <div
             className={`flex items-center p-4 mb-6 rounded-lg ${
@@ -169,7 +155,7 @@ const SoftwareRepoUpload = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Group Select */}
+          {/* Group */}
           <div>
             <label htmlFor="group" className={labelClasses}>
               <FolderDot className="w-5 h-5 mr-2" />
@@ -192,7 +178,7 @@ const SoftwareRepoUpload = () => {
             </select>
           </div>
 
-          {/* Type Select */}
+          {/* Type */}
           <div>
             <label htmlFor="type" className={labelClasses}>
               <Box className="w-5 h-5 mr-2" />
@@ -207,9 +193,12 @@ const SoftwareRepoUpload = () => {
               className={inputClasses}
             >
               <option value="">Choose Repository Type</option>
-              <option value="Document">Document</option>
-              <option value="Code">Code</option>
+              <option value="document">Document</option>
+              <option value="video">Video</option>
+              <option value="code_zip">Code ZIP</option>
+              <option value="github_repo">GitHub Repo</option>
               <option value="ZIP">ZIP File</option>
+              <option value="N/A">N/A</option>
             </select>
           </div>
 
@@ -220,10 +209,10 @@ const SoftwareRepoUpload = () => {
               GitHub URL (Optional)
             </label>
             <input
-              type="url" // Changed to type="url" for better validation
+              type="url"
               id="githubUrl"
               name="githubUrl"
-              placeholder="e.g., https://github.com/user/repo-name"
+              placeholder="e.g., https://github.com/user/repo"
               value={formData.githubUrl}
               onChange={handleChange}
               className={inputClasses}
@@ -240,23 +229,23 @@ const SoftwareRepoUpload = () => {
               type="text"
               id="clonedRepoPath"
               name="clonedRepoPath"
-              placeholder="e.g., /opt/cloned_repos/my-project"
+              placeholder="e.g., /home/user/repo"
               value={formData.clonedRepoPath}
               onChange={handleChange}
               className={inputClasses}
             />
           </div>
 
-          {/* Metadata Textarea */}
+          {/* Metadata */}
           <div>
             <label htmlFor="metadata" className={labelClasses}>
               <FileJson className="w-5 h-5 mr-2" />
-              Metadata (Optional, JSON format)
+              Metadata (Optional, JSON)
             </label>
             <textarea
               id="metadata"
               name="metadata"
-              placeholder='e.g., {"sizeInKB": 1200, "languages": ["Python", "JavaScript"]}'
+              placeholder='e.g., {"developerName": "John", "languageUsed": ["Python"]}'
               value={formData.metadata}
               onChange={handleChange}
               rows={4}
@@ -268,7 +257,7 @@ const SoftwareRepoUpload = () => {
             </p>
           </div>
 
-          {/* File Upload */}
+          {/* File Input */}
           <div>
             <label htmlFor="file-input" className={labelClasses}>
               <FileInput className="w-5 h-5 mr-2" />
@@ -276,7 +265,7 @@ const SoftwareRepoUpload = () => {
             </label>
             <input
               type="file"
-              id="file-input" // Added an ID for resetting
+              id="file-input"
               name="file"
               onChange={handleChange}
               className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 file:cursor-pointer transition-colors duration-200"

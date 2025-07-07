@@ -43,7 +43,9 @@ const TrialRepoUploader = () => {
       } catch (err) {
         console.error("Failed to load groups:", err);
         setSubmitStatus("error");
-        setSubmitMessage("Failed to load groups. Please try refreshing the page.");
+        setSubmitMessage(
+          "Failed to load groups. Please try refreshing the page."
+        );
       }
     };
     fetchGroups();
@@ -77,7 +79,9 @@ const TrialRepoUploader = () => {
     // Client-side validation
     if (!formData.group || !formData.type || !file) {
       setSubmitStatus("error");
-      setSubmitMessage("Please fill in all required fields (Group, Type, and upload a File).");
+      setSubmitMessage(
+        "Please fill in all required fields (Group, Type, and upload a File)."
+      );
       setLoading(false);
       return;
     }
@@ -88,7 +92,8 @@ const TrialRepoUploader = () => {
 
     // Only append if values exist
     if (formData.githubUrl) data.append("githubUrl", formData.githubUrl);
-    if (formData.clonedRepoPath) data.append("clonedRepoPath", formData.clonedRepoPath);
+    if (formData.clonedRepoPath)
+      data.append("clonedRepoPath", formData.clonedRepoPath);
 
     // Construct metadata object
     const metadata = {};
@@ -96,7 +101,10 @@ const TrialRepoUploader = () => {
     if (formData.duration) metadata.duration = parseFloat(formData.duration);
     if (formData.languageUsed) {
       // Split by comma and trim each language
-      metadata.languageUsed = formData.languageUsed.split(",").map(lang => lang.trim()).filter(lang => lang);
+      metadata.languageUsed = formData.languageUsed
+        .split(",")
+        .map((lang) => lang.trim())
+        .filter((lang) => lang);
     }
     data.append("metadata", JSON.stringify(metadata));
     data.append("file", file);
@@ -120,14 +128,15 @@ const TrialRepoUploader = () => {
       });
       setFile(null); // Clear selected file
       // Reset the file input element directly
-      if (document.getElementById('file-input-trial')) {
-        document.getElementById('file-input-trial').value = '';
+      if (document.getElementById("file-input-trial")) {
+        document.getElementById("file-input-trial").value = "";
       }
     } catch (err) {
       console.error("Upload failed:", err.response?.data || err.message || err);
       setSubmitStatus("error");
       setSubmitMessage(
-        "Upload failed: " + (err.response?.data?.message || "An unknown error occurred.")
+        "Upload failed: " +
+          (err.response?.data?.message || "An unknown error occurred.")
       );
     } finally {
       setLoading(false);
@@ -135,9 +144,12 @@ const TrialRepoUploader = () => {
   };
 
   // --- Reusable Tailwind CSS Classes ---
-  const inputClasses = "w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-gray-800 placeholder-gray-500";
-  const labelClasses = "block text-sm font-medium text-gray-700 mb-1 flex items-center";
-  const sectionTitleClasses = "text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center";
+  const inputClasses =
+    "w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 text-gray-800 placeholder-gray-500";
+  const labelClasses =
+    "block text-sm font-medium text-gray-700 mb-1 flex items-center";
+  const sectionTitleClasses =
+    "text-lg font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center";
 
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 mt-16">
@@ -174,7 +186,7 @@ const TrialRepoUploader = () => {
             <h3 className={sectionTitleClasses}>
               <Info className="w-5 h-5 mr-2 text-blue-500" /> Basic Information
             </h3>
-            
+
             {/* Group Select */}
             <div>
               <label htmlFor="group" className={labelClasses}>
@@ -203,7 +215,7 @@ const TrialRepoUploader = () => {
             </div>
 
             {/* Type Input */}
-            <div>
+            {/* <div>
               <label htmlFor="type" className={labelClasses}>
                 <Code className="w-5 h-5 mr-2" />
                 Type <span className="text-red-500 ml-1">*</span>
@@ -218,15 +230,37 @@ const TrialRepoUploader = () => {
                 className={inputClasses}
                 required
               />
+            </div> */}
+
+            {/* Type Select Dropdown */}
+            <div>
+              <label htmlFor="type" className={labelClasses}>
+                <Code className="w-5 h-5 mr-2" />
+                Type <span className="text-red-500 ml-1">*</span>
+              </label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className={inputClasses}
+                required
+              >
+                <option value="">Choose a Type</option>
+                <option value="Document">Document</option>
+                <option value="video">Video</option>
+                <option value="ZIP">ZIP</option>
+              </select>
             </div>
           </div>
 
           {/* Section: External Links */}
           <div className="pt-6 border-t border-gray-200 space-y-4">
             <h3 className={sectionTitleClasses}>
-              <Github className="w-5 h-5 mr-2 text-gray-600" /> External Links (Optional)
+              <Github className="w-5 h-5 mr-2 text-gray-600" /> External Links
+              (Optional)
             </h3>
-            
+
             {/* GitHub URL */}
             <div>
               <label htmlFor="githubUrl" className={labelClasses}>
@@ -265,9 +299,10 @@ const TrialRepoUploader = () => {
           {/* Section: Metadata */}
           <div className="pt-6 border-t border-gray-200 space-y-4">
             <h3 className={sectionTitleClasses}>
-              <Scale className="w-5 h-5 mr-2 text-green-600" /> Metadata (Optional)
+              <Scale className="w-5 h-5 mr-2 text-green-600" /> Metadata
+              (Optional)
             </h3>
-            
+
             {/* Size (KB) */}
             <div>
               <label htmlFor="sizeInKB" className={labelClasses}>
@@ -332,10 +367,13 @@ const TrialRepoUploader = () => {
               <FileInput className="w-5 h-5 mr-2 text-purple-600" /> File Upload
               <span className="text-red-500 ml-1">*</span>
             </h3>
-            
+
             {/* File Input */}
             <div>
-              <label htmlFor="file-input-trial" className="sr-only">Upload File</label> {/*sr-only for accessibility, visually hidden */}
+              <label htmlFor="file-input-trial" className="sr-only">
+                Upload File
+              </label>{" "}
+              {/*sr-only for accessibility, visually hidden */}
               <input
                 type="file"
                 id="file-input-trial"
@@ -345,7 +383,10 @@ const TrialRepoUploader = () => {
                 required
               />
               {file && (
-                <p className="mt-2 text-sm text-gray-600">Selected file: <span className="font-medium text-blue-700">{file.name}</span></p>
+                <p className="mt-2 text-sm text-gray-600">
+                  Selected file:{" "}
+                  <span className="font-medium text-blue-700">{file.name}</span>
+                </p>
               )}
             </div>
           </div>
