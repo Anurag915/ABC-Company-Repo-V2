@@ -8,7 +8,7 @@ const DocumentSchema = new Schema({
 });
 const CloseGroup = new Schema(
   {
-    groupName: { type: String, required: true },
+    groupName: { type: String, required: true, unique : true },
     groupPurpose: { type: String, required: true },
     groupDuration: {
       from: { type: Date, required: true },
