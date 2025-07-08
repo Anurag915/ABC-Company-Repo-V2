@@ -175,7 +175,7 @@ const LabPhotoManager = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 mt-16">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 mt-6">
       <div className=" mx-auto">
         <h2 className="text-4xl font-extrabold text-gray-900 mb-10 text-center flex items-center justify-center">
           <Camera className="w-10 h-10 text-indigo-600 mr-4" />

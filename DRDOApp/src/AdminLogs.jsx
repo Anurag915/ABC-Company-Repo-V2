@@ -54,7 +54,7 @@ const AdminLogs = () => {
   }, [searchQuery, logs]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 mt-16">
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 mt-14">
       <div className=" mx-auto bg-white p-6 rounded-xl shadow-lg">
         <h2 className="text-4xl font-extrabold text-gray-900 mb-8 flex items-center">
           <History className="w-9 h-9 text-blue-600 mr-4" />

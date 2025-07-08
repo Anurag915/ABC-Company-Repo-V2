@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import axios from "axios";
+
+// Define the API URL from environment variables or fallback to localhost
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 export default function InfiniteLabPhotos({ labId }) {
@@ -13,6 +15,9 @@ export default function InfiniteLabPhotos({ labId }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
+  // No fixed PHOTO_WIDTH or PHOTO_HEIGHT here.
+  // The component will adapt to its parent's width.
+
   const loadPhotos = async () => {
     if (loadingRef.current) return;
     loadingRef.current = true;
@@ -22,7 +27,6 @@ export default function InfiniteLabPhotos({ labId }) {
       const res = await axios.get(
         `${apiUrl}/api/labs/${labId}/photos?limit=${limit}&sortBy=createdAt:desc`
       );
-
       setPhotos(res.data);
       setCurrentIndex(0);
     } catch (err) {
@@ -36,7 +40,12 @@ export default function InfiniteLabPhotos({ labId }) {
   const scrollToIndex = useCallback(
     (index) => {
       if (!containerRef.current || photos.length === 0) return;
-      const photoWidth = 500;
+
+      // Get the actual width of the first photo element after rendering
+      const firstPhotoElement = containerRef.current.querySelector('.photo-item');
+      if (!firstPhotoElement) return; // Should not happen if photos.length > 0
+
+      const photoWidth = firstPhotoElement.offsetWidth; // Get dynamic width
       const gapPx = parseFloat(getComputedStyle(containerRef.current).gap || "0px");
       const itemWidth = photoWidth + gapPx;
 
@@ -45,7 +54,7 @@ export default function InfiniteLabPhotos({ labId }) {
         behavior: "smooth",
       });
     },
-    [photos]
+    [photos] // Depend on photos, as rendered elements' sizes might change
   );
 
   const handleNext = useCallback(() => {
@@ -79,7 +88,10 @@ export default function InfiniteLabPhotos({ labId }) {
 
     autoSlideIntervalRef.current = setTimeout(() => {
       const scrollLeft = containerRef.current.scrollLeft;
-      const photoWidth = 500;
+      const firstPhotoElement = containerRef.current.querySelector('.photo-item');
+      if (!firstPhotoElement) return;
+
+      const photoWidth = firstPhotoElement.offsetWidth; // Get dynamic width
       const gapPx = parseFloat(getComputedStyle(containerRef.current).gap || "0px");
       const itemWidth = photoWidth + gapPx;
 
@@ -112,11 +124,14 @@ export default function InfiniteLabPhotos({ labId }) {
     return photos.map((photo, index) => (
       <div
         key={photo._id}
+        className="photo-item" // Added class for easier selection in scrollToIndex
         style={{
           scrollSnapAlign: "center",
           flexShrink: 0,
-          width: "500px",
-          height: "300px",
+          width: "100%", // Take 100% of the parent container's width
+          aspectRatio: "16 / 9", // Maintain a widescreen aspect ratio
+          minHeight: "200px", // Minimum height for smaller screens/containers
+          maxHeight: "350px", // Maximum height to prevent excessive size
           position: "relative",
           borderRadius: "8px",
           boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
@@ -126,7 +141,6 @@ export default function InfiniteLabPhotos({ labId }) {
           justifyContent: "center",
           willChange: "transform",
           transform: "translateZ(0)",
-          // No pointerEvents: "none" here on the photo wrapper itself
           backgroundColor: "#fff",
         }}
       >
@@ -139,7 +153,7 @@ export default function InfiniteLabPhotos({ labId }) {
             height: "100%",
             objectFit: "cover",
             display: "block",
-            pointerEvents: "auto", // Re-enable pointer events for the image itself
+            pointerEvents: "auto",
           }}
         />
       </div>
@@ -147,39 +161,37 @@ export default function InfiniteLabPhotos({ labId }) {
   }, [photos]);
 
   const navButtonStyle = useCallback(
-    (side) => ({
-      position: "absolute",
-      // Calculate top position based on the fixed image height (300px)
-      top: "calc(50% - 150px + 150px)", // 50% of the main container, then adjust
-      transform: "translateY(-50%)", // Center vertically relative to its own height
+    (side) => {
+      // Get the actual width of the container to position buttons accurately
+      const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0;
+      const buttonOffset = 10; // Padding from the edge of the visible photo
 
-      // Position relative to the *visible area* of the image container (500px width)
-      [side === "left" ? "left" : "right"]: `calc(50% - 250px + 10px)`, // 50% of main container, minus half image width, plus some padding from edge
-      // For the other side, if it's 'right', it will be `calc(50% + 250px - 50px)` for button width
-      // Let's refine for clarity:
-      ...(side === "left" && { left: 'calc(50% - 250px + 10px)' }), // 50% of 960px container, minus half photo width (250px), plus 10px for inner padding
-      ...(side === "right" && { right: 'calc(50% - 250px + 10px)' }), // Same logic for right
-
-      zIndex: 10,
-      background: "rgba(0,0,0,0.5)",
-      color: "white",
-      border: "none",
-      borderRadius: "50%",
-      width: "40px",
-      height: "40px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-      fontSize: "1.5rem",
-      paddingBottom: "2px",
-      opacity: isHovered ? 1 : 0,
-      transition: "opacity 0.3s ease, background-color 0.3s ease",
-      backdropFilter: "blur(3px)",
-      "&:hover": {
-        backgroundColor: "rgba(0,0,0,0.7)",
-      },
-    }),
+      return {
+        position: "absolute",
+        top: "50%",
+        transform: "translateY(-50%)",
+        [side === "left" ? "left" : "right"]: `calc(50% - ${containerWidth / 2}px + ${buttonOffset}px)`,
+        zIndex: 10,
+        background: "rgba(0,0,0,0.5)",
+        color: "white",
+        border: "none",
+        borderRadius: "50%",
+        width: "36px",
+        height: "36px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        cursor: "pointer",
+        fontSize: "1.3rem",
+        paddingBottom: "2px",
+        opacity: isHovered ? 1 : 0,
+        transition: "opacity 0.3s ease, background-color 0.3s ease",
+        backdropFilter: "blur(3px)",
+        "&:hover": {
+          backgroundColor: "rgba(0,0,0,0.7)",
+        },
+      };
+    },
     [isHovered]
   );
 
@@ -187,18 +199,16 @@ export default function InfiniteLabPhotos({ labId }) {
     <div
       style={{
         position: "relative",
-        width: "100%",
-        maxWidth: "960px",
-        // The height of the main container should accommodate the images + dots
-        minHeight: "350px", // 300px image height + some margin for dots
-        margin: "2rem auto",
+        width: "100%", // Take full width of parent column
+        minHeight: "280px", // Minimum height for the overall component (photo + dots)
+        maxHeight: "420px", // Max height for the overall component
+        margin: "0 auto", // Center horizontally, no vertical margin from this component
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        overflow: "hidden", // Still hide overflow for the main component
+        overflow: "hidden",
       }}
-      // Re-enable hover listener on the main container to show/hide buttons
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -208,12 +218,13 @@ export default function InfiniteLabPhotos({ labId }) {
         style={{
           scrollSnapType: "x mandatory",
           scrollBehavior: "smooth",
-          width: "calc(500px + 2rem)", // Correct width (image + padding on both sides)
-          margin: "0 auto", // Center the visible scroll area
-          padding: "0 1rem", // Padding to show partial next/prev image
-          gap: "1rem",
-          position: "relative", // KEEP this for scrollSnapAlign to work reliably
-          height: "300px", // Set fixed height
+          width: "100%", // Take 100% of its parent's width
+          margin: "0 auto",
+          padding: "0",
+          gap: "0.5rem", // Small gap between photos
+          position: "relative",
+          minHeight: "200px", // Min height for the scrollable area
+          maxHeight: "350px", // Max height for the scrollable area
           boxSizing: "content-box",
         }}
         tabIndex={0}
@@ -225,12 +236,14 @@ export default function InfiniteLabPhotos({ labId }) {
             style={{
               scrollSnapAlign: "center",
               flexShrink: 0,
-              width: "500px",
-              height: "300px",
+              width: "100%",
+              aspectRatio: "16 / 9",
+              minHeight: "200px",
+              maxHeight: "350px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "1.2rem",
+              fontSize: "1.1rem",
               color: "#666",
               backgroundColor: "#f8f8f8",
               borderRadius: "8px",
@@ -245,13 +258,15 @@ export default function InfiniteLabPhotos({ labId }) {
             style={{
               scrollSnapAlign: "center",
               flexShrink: 0,
-              width: "500px",
-              height: "300px",
+              width: "100%",
+              aspectRatio: "16 / 9",
+              minHeight: "200px",
+              maxHeight: "350px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: "1rem",
+              fontSize: "0.9rem",
               color: "#666",
               backgroundColor: "#f8f8f8",
               borderRadius: "8px",
@@ -266,8 +281,7 @@ export default function InfiniteLabPhotos({ labId }) {
         )}
       </div>
 
-      {/* Navigation buttons moved back to the parent of containerRef */}
-      {/* Their position will be absolute relative to the outermost div */}
+      {/* Navigation buttons */}
       {photos.length > 0 && (
         <>
           <button
@@ -289,13 +303,13 @@ export default function InfiniteLabPhotos({ labId }) {
 
       {/* Dots */}
       {photos.length > 0 && (
-        <div style={{ display: "flex", marginTop: "1.5rem", gap: "0.6rem" }}>
+        <div style={{ display: "flex", marginTop: "0.75rem", gap: "0.4rem" }}>
           {Array.from({ length: photos.length }).map((_, index) => (
             <span
               key={index}
               style={{
-                width: currentIndex === index ? "12px" : "10px",
-                height: currentIndex === index ? "12px" : "10px",
+                width: currentIndex === index ? "9px" : "7px",
+                height: currentIndex === index ? "9px" : "7px",
                 borderRadius: "50%",
                 backgroundColor: currentIndex === index ? "#333" : "#bbb",
                 cursor: "pointer",

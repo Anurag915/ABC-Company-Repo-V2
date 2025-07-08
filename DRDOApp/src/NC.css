@@ -1,42 +1,132 @@
-/* src/components/NC.css */
+/* NC.css */
 
-/* Define the keyframes for the continuous scroll */
-@keyframes nc-marquee-scroll {
-  0% {
-    transform: translateY(0%);
-  }
-  100% {
-    transform: translateY(-50%); /* Scrolls up by half the content height */
-  }
+/* General container for the list, removing marquee-specific overflow setup */
+.nc-list-container {
+    /* The parent component (HomePage) should manage overflow-y if needed for its card */
+    position: relative;
+    padding: 0.5rem 0; /* Some internal padding for the list */
 }
 
-.nc-scroll-container {
-  height: 100%; /* Important: This needs to match the height of the parent card */
-  overflow: hidden; /* Hide overflowing content */
-  position: relative; /* For animation positioning */
-}
+/* Removed marquee animation definitions and related classes */
+/* @keyframes nc-marquee */
+/* .nc-marquee-animation */
+/* .nc-scroll-container:hover .nc-marquee-animation */
 
-.nc-scroll-content {
-  display: flex;
-  flex-direction: column;
-  /* Initial position of content for animation */
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  /* Will be set dynamically by JS: animation-duration: Xms; */
-}
-
-.nc-marquee-animation {
-  animation-name: nc-marquee-scroll;
-}
-
-/* Pause animation on hover for better readability */
-.nc-scroll-container:hover .nc-scroll-content {
-  animation-play-state: paused;
-}
-
-/* Additional styling for individual scroll items, mostly Tailwind based */
-/* These are duplicated from JS for clarity, but primarily handled by Tailwind classes on the li */
+/* List item styling to match the image: clear lines, padding */
 .nc-scroll-item {
-  flex-shrink: 0; /* Prevents items from shrinking */
-  width: 100%; /* Ensures items take full width */
+    padding: 0.75rem 0.5rem; /* Padding for each item */
+    border-bottom: 1px solid #e5e7eb; /* Light gray line separator */
+    background-color: #ffffff; /* Ensure white background for items */
+}
+
+/* Remove border from the last item */
+.nc-list-container .nc-scroll-item:last-child {
+    border-bottom: none;
+}
+
+/* Anchor tag for the item link */
+.nc-scroll-item a {
+    display: flex; /* Use flexbox for name and potential "new" tag */
+    align-items: center; /* Vertically align items */
+    white-space: nowrap; /* Keep text on a single line */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+    color: #374151; /* Darker text color for professionalism */
+    text-decoration: none; /* No underline by default */
+    transition: color 0.2s ease-in-out; /* Smooth transition for hover */
+}
+
+.nc-scroll-item a:hover {
+    color: #2563eb; /* Blue on hover, similar to image */
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Style for the "new" tag if implemented in HTML */
+.nc-new-tag {
+    display: inline-block;
+    background-color: #ef4444; /* Red background */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+    flex-shrink: 0; /* Prevent it from shrinking */
+    line-height: 1; /* Adjust line height for better vertical alignment */
+}
+
+/* Styles for pagination */
+.nc-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    margin-top: 1.5rem; /* Space above pagination */
+    padding: 0.5rem;
+    background-color: #f9fafb; /* Light background for pagination area */
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.nc-pagination-button {
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    color: #4b5563;
+    padding: 0.5rem 0.9rem;
+    margin: 0 0.2rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.nc-pagination-button:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+    color: #1f2937;
+}
+
+.nc-pagination-button.active {
+    background-color: #2563eb; /* Blue for active page */
+    border-color: #2563eb;
+    color: white;
+    font-weight: 600;
+}
+
+.nc-pagination-button.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Hide the default scrollbar (if any residual) */
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera*/
+}
+
+/* Header style for "NEWS / JOBS" */
+.nc-header-title {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 700; /* font-bold */
+    text-align: center;
+    color: #1f2937; /* text-gray-900 */
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    position: relative;
+}
+
+.nc-header-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background-color: #10b981; /* Green accent from image */
+    border-radius: 9999px;
 }

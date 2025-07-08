@@ -86,8 +86,8 @@ const AddGroupForm = ({ labId }) => {
   };
 
   return (
-    <section className="container mx-auto my-16 px-4">
-      <div className="mt-14  mx-auto bg-white p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-100">
+    <section className="container mx-auto my-16">
+      <div className="mt-16 mx-auto bg-white p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-100">
         <h2 className="text-3xl font-extrabold text-purple-700 flex items-center justify-center mb-8 border-b-2 border-purple-200 pb-4">
           <UsersRound className="mr-3 text-purple-600 w-8 h-8" />
           Create New Research Group

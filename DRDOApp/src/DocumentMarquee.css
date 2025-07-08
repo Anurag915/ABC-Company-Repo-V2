@@ -1,4 +1,4 @@
-/* DocumentMarquee.css
+/* Container holding the marquee */
 .marquee-container {
   position: fixed;
   top: 0;
@@ -9,53 +9,52 @@
   background-color: white;
   border-bottom: 1px solid #ccc;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* The moving content */
+.marquee-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll-left 10s linear infinite; /* Reduced to 10s for faster speed */
+}
+
+/* Each document link */
 .doc-link {
   margin-right: 40px;
   color: #ff0000;
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-}
-
-.doc-link:hover {
-  text-decoration: underline;
-}
-.navbar {
-  position: relative;
-  z-index: 1100;
-}
- */
-
-.marquee-wrapper {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.news-flash-label {
-  background-color: #facc15; /* amber-400 */
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.375rem;
-  box-shadow: 0 0 5px rgba(250, 204, 21, 0.7);
-  white-space: nowrap;
-}
-
-.marquee {
-  position: fixed;
-  height: 1.5rem;
-  scrollbar-width: none; /* Firefox */
-}
-
-.marquee::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
-}
-
-.doc-link {
-  transition: color 0.2s ease-in-out;
-  user-select: none;
+  transition: color 0.15s ease-in-out;
 }
 
 .doc-link:hover {
   color: #1d4ed8; /* blue-700 */
   text-decoration: underline;
+}
+
+/* Optional label before the marquee */
+.news-flash-label {
+  background-color: #facc15; /* amber-400 */
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 0 5px rgba(250, 204, 21, 0.7);
+  margin-right: 1rem;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Keyframes for scrolling effect */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }

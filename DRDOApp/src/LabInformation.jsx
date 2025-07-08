@@ -12,7 +12,7 @@ import ProductsAndAdvertisements from "./ProductsAndAdvertisements";
 import OfficeOfDirector from "./OfficeOfDirector";
 import LabHistoryDetails from "./LabHistoryDetails";
 import LabManpowerList from "./LabManpowerList";
-import InfiniteLabPhotos from "./InfiniteLabPhotos"; // Ensure this is the updated version
+import InfiniteLabPhotos from "./InfiniteLabPhotos";
 import NC from "./NC";
 import ExternalLinksViewer from "./ExternalLinksViewer";
 
@@ -31,7 +31,7 @@ const sections = [
   "Contact Us",
 ];
 
-function HomePage() {
+function LabInformation() {
   const [selectedSection, setSelectedSection] = useState("About Lab");
   const [labId, setLabId] = useState(null);
 
@@ -77,53 +77,37 @@ function HomePage() {
   };
 
   return (
-    <div className="bg-gray-50 font-sans text-black mt-16 px-4 sm:px-6 lg:px-8">
-      {/* Top Section: Lab Gallery (Full Width) */}
-      <div className="grid grid-cols-1 gap-4 mb-6 mx-auto "> {/* Changed to grid-cols-1 for full width on all screens */}
-        <div className="col-span-1 bg-white p-4 rounded-lg shadow-xl border border-gray-100 flex flex-col min-h-[350px] overflow-hidden">
-          
-          <div className="flex-grow flex items-center justify-center">
-            {labId ? (
-              <InfiniteLabPhotos labId={labId} />
-            ) : (
-              <p className="text-gray-500 text-base">Loading gallery...</p>
-            )}
-          </div>
-        </div>
-      </div>
+    <div className="bg-gray-50 font-sans text-black mt-8 px-4 sm:px-6 lg:px-8">
+      {/* Main Content Area: Sidebar and Dynamic Content */}
+      <main className="flex flex-col md:flex-row mx-auto shadow-xl rounded-lg bg-white overflow-hidden border border-gray-100 mb-10">
+        {/* Sidebar */}
+        <aside className="w-full md:w-1/5 bg-blue-50 p-6 space-y-3 border-r border-blue-100 shadow-inner">
+          {sections.map((section) => (
+            <button
+              key={section}
+              onClick={() => setSelectedSection(section)}
+              className={`w-full text-left px-4 py-2 rounded-lg font-semibold transition duration-300 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 ${
+                selectedSection === section
+                  ? "bg-blue-700 text-white shadow-md font-bold"
+                  : "bg-white text-blue-800 hover:bg-blue-200"
+              }`}
+              aria-current={selectedSection === section ? "page" : undefined}
+            >
+              {section}
+            </button>
+          ))}
+        </aside>
 
-      {/* Second Row: Notices & Circulars and External Links (Side-by-Side) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6 mx-auto "> {/* New grid for side-by-side */}
-        {/* Notices & Circulars Card - Takes 1/2 width on large screens */}
-        <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-xl border border-gray-100 flex flex-col min-h-[350px] max-h-[450px] overflow-hidden">
-          <h3 className="text-xl font-bold text-green-800 mb-3 border-b-2 border-green-200 pb-2">
-            Latest Notices & Circulars
-          </h3>
-          <div className="flex-grow overflow-y-auto pr-2">
-            {labId ? (
-              <NC labId={labId} />
-            ) : (
-              <p className="text-gray-500 text-base">Loading notices...</p>
-            )}
-          </div>
-        </div>
-
-        {/* External Links Card - Takes 1/2 width on large screens */}
-        <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-xl border border-gray-100 flex flex-col min-h-[350px] max-h-[450px] overflow-hidden">
-          <h3 className="text-xl font-bold text-purple-800 mb-3 border-b-2 border-purple-200 pb-2">
-            Useful External Links
-          </h3>
-          <div className="flex-grow overflow-y-auto pr-2">
-            {labId ? (
-              <ExternalLinksViewer labId={labId} />
-            ) : (
-              <p className="text-gray-500 text-base">Loading links...</p>
-            )}
-          </div>
-        </div>
-      </div>      
+        {/* Content Area */}
+        <section className="flex-1 p-6 md:p-10 bg-white">
+          <h2 className="text-3xl font-extrabold text-blue-700 mb-6 border-b-2 pb-3 border-blue-300">
+            {selectedSection}
+          </h2>
+          <div className="text-gray-800 leading-relaxed">{renderContent()}</div>
+        </section>
+      </main>
     </div>
   );
 }
 
-export default HomePage;
+export default LabInformation;

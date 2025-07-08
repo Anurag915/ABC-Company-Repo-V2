@@ -53,7 +53,7 @@ const AddLabForm = () => {
   };
 
   return (
-    <section className="container mt-14 mx-auto my-16 px-4"> {/* Increased margin and padding */}
+    <section className="container mt-10 mx-auto my-16 px-4"> {/* Increased margin and padding */}
       <div className=" mx-auto bg-white p-8 sm:p-10 rounded-2xl shadow-2xl border border-gray-100"> {/* Enhanced shadow and border */}
         <h2 className="text-3xl font-extrabold text-blue-700 flex items-center justify-center mb-8 border-b-2 border-blue-200 pb-4"> {/* Larger, bolder heading, centered */}
           <FlaskConical className="mr-3 text-blue-600 w-8 h-8" /> {/* Larger icon */}

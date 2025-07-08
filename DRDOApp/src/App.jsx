@@ -36,6 +36,7 @@ import TrialRepoUpload from "./TrialRepoUpload";
 import TrialRepoViewer from "./TrialRepoViewer";
 import LabPhotoManager from "./LabPhotoManager";
 import ExternalLinksAdmin from "./ExternalLinksAdmin";
+import LabInformation from "./LabInformation";
 function App() {
   return (
     <Router>
@@ -67,6 +68,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/closeGroup" element={<UserCloseGroupDocs />} />
             <Route path="/directorprofile" element={<DirectorProfile />} />
+            <Route path="/labInformation" element={<LabInformation />} />
             <Route
               path="/my-group"
               element={

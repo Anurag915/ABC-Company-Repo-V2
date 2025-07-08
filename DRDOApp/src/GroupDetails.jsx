@@ -112,7 +112,7 @@ function GroupPage() {
   };
 
   return (
-    <div className="bg-gray-50 font-sans text-black mt-20">
+    <div className="bg-gray-50 font-sans text-black mt-16">
       <main className="flex flex-col md:flex-row mx-auto shadow-lg rounded-lg bg-white">
         <aside className="w-full md:w-1/5 bg-green-100 p-6 space-y-4 rounded-l-lg border-r border-green-300 shadow-inner">
           {sections.map((section) => (
